@@ -1,0 +1,98 @@
+<HTML>
+  <HEAD>
+    <TITLE>SDR</TITLE>
+  </HEAD>
+  <BODY>
+    <CENTER>
+      <H1>SDR Software</H1>
+      Tom Kuiper<BR/>
+      2014 Jan 21
+    </CENTER>
+    <H2>Software</H2>
+    <DL>
+      <DT>baseline_avg.py</DT>
+      <DD>
+        The data files consist of rows with (freq, power) pairs. There are 64
+        pairs for each spectrum.  The spectra are taken so that the frequencies
+        increase monotonically.  The number of rows must be n*64, where n is
+        the number of spectra.
+      </DD>
+      <DT>chained_queues.py</DT>
+      <DD>
+        A number of threads operate on RF data in a chain.  A receiver thread
+        gets the data from the SDR.
+      </DD>
+      <DT>examine_raw.py</DT>
+      <DD>
+        Reads <TT>/tmp/capture.bin</TT> which is created by running<BR/>
+        <TT>rtlsdr {args} /tmp/capture.bin</TT><BR/>
+        after compiling the code in <TT>/opt/rtl-sdr</TT>.
+      </DD>
+      <DT>hires_scan.py</DT>
+      <DD>
+        Scans through the spectrum with a 'step' MHz band and tranforming the
+        data into a 64 point spectrum.
+      </DD>
+      <DT>power_scan.py</DT>
+      <DD>
+        Steps through the spectrum in 1 MHz steps, capturing data at 1 MS/s and
+        converting that to LSB and USB.  In effect, 500 kHz resolution.
+      </DD>
+      <DT>power_cal.py</TT>
+      <DD>
+        Updated version of power_scan.py which uses the RtlSdr class.
+        It also will accomodate scans at various gain settings.It also will
+        accomodate scans at various gain settings.
+      </DD>
+      <DT>read_test.py</DT>
+      <DD>
+        Makes a dynamic spectrum of the raw I/Q data in
+        <TT>/tmp/capture.bin</TT>.
+      </DD>
+      <DT>test_hist.py</DT>
+      <DD>
+        Grabs data at 1 MS/s and plots histograms for the I and Q samples.
+      </DD>
+      <DT>test_sidebands.py</DT>
+      <DD>
+        Tests the sideband separation function by comparing the LSB and USB
+        averages to bar graph spectra taken with various resolutions from 4 to
+        16 channels.
+      </DD>
+    </DL>
+    <H2><TT>rtlsdr</TT> Module</H2>
+
+    If this module is run as a program it will produce a dynamic spectrum.
+    <H3>Classes</H3>
+    <DL>
+      <DT>RtlSdrDevStr(ct.Structure)</DT>
+      <DD>
+        The parent library has defined a type called <TT>rtlsdr_dev</TT> in
+          <TT>/opt/rtl-sdr/src/librtlsdr.c</TT>.  It is very complicated but
+          we don't plan to use its components.  We just need a generic Python
+          class to represent it so we can use it as an argument in library
+          calls.
+      </DD>
+      <DT>RtlSdrException(Exception)</DT>
+      <DD>Exception class for rtlsdr module.</DD>
+      <DT>RtlSdr(object)</DT>
+      <DD>
+        Class to represent a RealTek-based SDR.
+      </DD>
+    </DL>
+    <H3>Module Methods</H3>
+    <DL>
+      <DT>get_device_count()</DT>
+      <DD>Returns the number of RTL SDR devices on the bus.</DD>
+      <DT>get_device_strings(dev_ID)</DT>
+      <DD>
+        Returns identifying information -- vendor, product and serial number--
+        from the SDR assigned number 'dev_ID'.
+      </DD>
+      <DT>get_device_name(dev_ID)</DT>
+      <DD>Get the name of the specified RTL SDR device.</DD>
+      <DT>init_sdr(dev_ID=0, dflt_blk_size=None)</DT>
+      <DD>Initialize an RtlSdr instance.</DD>
+    </DL>
+  </BODY>
+</HTML>

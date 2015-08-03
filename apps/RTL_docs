@@ -1,0 +1,12 @@
+ 
+kuiper@kuiper:/usr/local/projects/Lightning$ rtl_test -h
+rtl_test: invalid option -- 'h'
+rtl_test, a benchmark tool for RTL2832 based DVB-T receivers
+
+Usage:
+        [-s samplerate (default: 2048000 Hz)]
+        [-d device_index (default: 0)]
+        [-t enable Elonics E4000 tuner benchmark]
+        [-p enable PPM error measurement]
+        [-b output_block_size (default: 16 * 16384)]
+        [-S force sync output (default: async)]
