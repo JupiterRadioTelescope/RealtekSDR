@@ -1,7 +1,7 @@
 """
 Grabs data at 1 MS/s and plots histograms for the I and Q samples.
 """
-from rtlsdr import *
+from RealtekSDR import *
 from pylab import *
 import scipy.fftpack
 from time import sleep
@@ -19,8 +19,8 @@ rtlsdr = RtlSdr(0)
 sr = rtlsdr.set_samplerate(int(step*1000000))
 gains = rtlsdr.get_tuner_gains()
 print "gains =", gains
-# rtlsdr.set_gain_manual(True)
-gain = gains[0]
+rtlsdr.set_gain_manual(True)
+gain = gains[-1]
 status = rtlsdr.set_gain(gain)
 print "gain =", gain
 status = rtlsdr.reset_buffer()

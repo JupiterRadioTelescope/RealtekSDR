@@ -48,7 +48,7 @@ from numpy import arange, array
 from time import sleep
 import logging
 
-from RealtekSDR.Data_Reduction import sideband_separate, unpack_to_complex
+from RealtekSDR.Signals import sideband_separate, unpack_to_complex
 
 module_logger = logging.getLogger(__name__)
 

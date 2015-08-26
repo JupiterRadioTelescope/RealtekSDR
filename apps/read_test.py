@@ -20,7 +20,7 @@ from pylab import *
 import argparse
 from rtlsdr import show_image
 from Graphics import make_spectrogram
-from Data_Reduction import unpack_to_complex
+from RealtekSDR.Signals import unpack_to_complex
 
 files = {1: "/tmp/capture.bin"}
 for f in files.keys():
