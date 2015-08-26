@@ -9,13 +9,13 @@ from numpy.polynomial.chebyshev import chebval
 from cPickle import load
 import logging
 
-from rtlsdr import *
-from stations import FM_station, TV_station
-from Graphics import make_spectrogram
+from RealtekSDR import *
+from RealtekSDR.stations import FM_station, TV_station
+from RealtekSDR.Signals import make_spectrogram
 
 mylogger = logging.getLogger()
 logging.basicConfig()
-mylogger.setLevel(logging.WARNING)
+mylogger.setLevel(logging.INFO)
 
 labels = True
 normalize = True
@@ -24,13 +24,14 @@ end = 139
 step = 2
 num_bins = 64
 
-n = get_device_count()
-vendor, product, serial = get_device_strings(0)
-device = get_device_name(0)
-rtlsdr = RtlSdr(0)
-sr = rtlsdr.set_samplerate(int(step*1000000))
+#n = get_device_count()
+#vendor, product, serial = get_device_strings(0)
+#device = get_device_name(0)
+#rtlsdr = RtlSdr(0)
+#sr = rtlsdr.set_samplerate(int(step*1000000))
+rtlsdr = init_sdr(dev_ID=0, sample_rate=int(step*1000000))
 gains = rtlsdr.get_tuner_gains()
-print "gains =", gains
+mylogger.info(" gains = %s", gains)
 # We want high gain (but not saturating) when examining the spectrum
 # but low gain to get the baseline shape.
 if normalize:
@@ -38,9 +39,9 @@ if normalize:
 else:
   gain = gains[1]
 status = rtlsdr.set_gain(gain)
-print "gain =", gain
+mylogger.info(" gain = %d", gain)
 status = rtlsdr.reset_buffer()
-print "reset_buffer status:",status
+mylogger.info(" reset_buffer status: %s",status)
 
 if normalize:
   coeffile = open("baseline_coefs.pkl","rb")
