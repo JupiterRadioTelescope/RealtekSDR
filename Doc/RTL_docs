@@ -1,6 +1,19 @@
+rtl_tcp, an I/Q spectrum server for RTL2832 based DVB-T receivers
+
+Usage:	[-a listen address]
+	[-p listen port (default: 1234)]
+	[-f frequency to tune to [Hz]]
+	[-g gain (default: 0 for auto)]
+	[-s samplerate in Hz (default: 2048000 Hz)]
+	[-b number of buffers (default: 32, set by library)]
+	[-n max number of linked list buffers to keep (default: 500)]
+	[-d device index (default: 0)]
+
+Example running on home RPi:
+  rtl_tcp -a 192.168.0.13 -f 89900000 -s 200000
+streams raw KPFK data.
  
-kuiper@kuiper:/usr/local/projects/Lightning$ rtl_test -h
-rtl_test: invalid option -- 'h'
+----------------------------------------------------------------------
 rtl_test, a benchmark tool for RTL2832 based DVB-T receivers
 
 Usage:
@@ -10,3 +23,5 @@ Usage:
         [-p enable PPM error measurement]
         [-b output_block_size (default: 16 * 16384)]
         [-S force sync output (default: async)]
+
+

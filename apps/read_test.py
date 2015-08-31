@@ -15,7 +15,6 @@ Format example obtained from http://pastebin.com/hcwyKvX7
 
 from struct import *
 from numpy import array
-from numpy.fft import fft
 from pylab import *
 import argparse
 from rtlsdr import show_image
