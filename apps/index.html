@@ -1,14 +1,202 @@
 <HTML>
   <HEAD>
-    <TITLE>SDR</TITLE>
+    <TITLE>Realtek SDR</TITLE>
   </HEAD>
   <BODY>
     <CENTER>
-      <H1>SDR Software</H1>
+      <H1>Realtek SDR Software</H1>
       Tom Kuiper<BR/>
-      2014 Jan 21
+      2015 Sep 16
     </CENTER>
-    <H2>Software</H2>
+    <H2>RTL Executables</H2>
+    <H3><TT>rtl_adsb</TT>, a simple ADS-B decoder</H3>
+    Automatic dependent surveillance - broadcast (ADS-B) is a cooperative 
+    surveillance technology in which an aircraft determines its position via 
+    satellite navigation and periodically broadcasts it, enabling it to be 
+    tracked. The information can be received by air traffic control ground 
+    stations as a replacement for secondary radar. It can also be received 
+    by other aircraft to provide situational awareness and allow self 
+    separation.  ADS-B operates at 1090 MHz ("Extended Squitter") and 978 MHz
+    ("UAT").
+
+    ADS-B equipment is mandatory in portions of Australian airspace.  Canada 
+    is already using ADS-B for Air Traffic Control.
+    
+    For more information see <A HREF="http://www.ads-b.com/">ADS-B 
+    Technologies</A>. The ADS-B 1090ES 
+    <A = HREF="http://www.radartutorial.eu/13.ssr/sr25.en.html">message 
+    format</A> consists of a clock synch preamble followed by 112 bits.
+    <PRE>
+Use:	rtl_adsb [-R] [-g gain] [-p ppm] [output file]
+	[-d device_index (default: 0)]
+	[-V verbove output (default: off)]
+	[-S show short frames (default: off)]
+	[-Q quality (0: no sanity checks, 0.5: half bit, 1: one bit (default), 2: two bits)]
+	[-e allowed_errors (default: 5)]
+	[-g tuner_gain (default: automatic)]
+	[-p ppm_error (default: 0)]
+	filename (a '-' dumps samples to stdout)
+	 (omitting the filename also uses stdout)</PRE>
+    Examples:
+    <PRE>
+Streaming with netcat:
+	rtl_adsb | netcat -lp 8080
+	while true; do rtl_adsb | nc -lp 8080; done
+Streaming with socat:
+	rtl_adsb | socat -u - TCP4:sdrsharp.com:47806</PRE>
+
+    <H3><TT>rtl_eeprom</TT>, an EEPROM programming tool for RTL2832 based DVB-T receivers</H3>
+    <PRE>
+Usage:
+	[-d device_index (default: 0)]
+	[-m <str> set manufacturer string]
+	[-p <str> set product string]
+	[-s <str> set serial number string]
+	[-i <0,1> disable/enable IR-endpoint]
+	[-g <conf> generate default config and write to device]
+	[   <conf> can be one of:]
+	[   realtek		Realtek default (as without EEPROM)]
+	[   realtek_oem		Realtek default OEM with EEPROM]
+	[   noxon		Terratec NOXON DAB Stick]
+	[   terratec_black	Terratec T Stick Black]
+	[   terratec_plus	Terratec T Stick+ (DVB-T/DAB)]
+	[-w <filename> write dumped file to device]
+	[-r <filename> dump EEPROM to file]
+	[-h display this help text]</PRE>
+Use on your own risk, especially -w!
+
+    <H3><TT>rtl_fm</TT>, a simple narrow band FM demodulator for RTL2832 based DVB-T receivers</H3>
+    
+    Produces signed 16 bit ints, use Sox or aplay to hear them.
+    
+    <PRE>
+Use:	rtl_fm -f freq [-options] [filename]
+	-f frequency_to_tune_to [Hz]
+	 (use multiple -f for scanning, requires squelch)
+	 (ranges supported, -f 118M:137M:25k)
+	[-s sample_rate (default: 24k)]
+	[-d device_index (default: 0)]
+	[-g tuner_gain (default: automatic)]
+	[-l squelch_level (default: 0/off)]
+	[-o oversampling (default: 1, 4 recommended)]
+	[-p ppm_error (default: 0)]
+	[-E sets lower edge tuning (default: center)]
+	[-N enables NBFM mode (default: on)]
+	[-W enables WBFM mode (default: off)]
+	 (-N -s 170k -o 4 -A fast -r 32k -l 0 -D)
+	filename (a '-' dumps samples to stdout)
+	 (omitting the filename also uses stdout)
+
+Experimental options:
+	[-r output_rate (default: same as -s)]
+	[-t squelch_delay (default: 20)]
+	 (+values will mute/scan, -values will exit)
+	[-M enables AM mode (default: off)]
+	[-L enables LSB mode (default: off)]
+	[-U enables USB mode (default: off)]
+	[-R enables raw mode (default: off, 2x16 bit output)]
+	[-F enables Hamming FIR (default: off/square)]
+	[-D enables de-emphasis (default: off)]
+	[-C enables DC blocking of output (default: off)]
+	[-A std/fast/lut choose atan math (default: std)]</PRE>
+
+
+    Examples:
+    <PRE>
+	rtl_fm ... - | play -t raw -r 24k -es -b 16 -c 1 -V1 -
+	             | aplay -r 24k -f S16_LE -t raw -c 1
+	  -s 22.5k - | multimon -t raw /dev/stdin</PRE>
+	  Such as:
+	  <PRE>
+pi@Umber-Pi ~ $ rtl_fm -f 91500000 | aplay -r 24k -f S16_LE -t raw -c 1</PRE>
+	  
+    <H3><TT>rtl_power</TT>, a simple FFT logger for RTL2832 based DVB-T receivers</H3>
+    <PRE>
+Use:	rtl_power -f freq_range [-options] [filename]
+	-f lower:upper:bin_size [Hz]
+	 (bin size is a maximum, smaller more convenient bins
+	  will be used.  valid range 1Hz - 2.8MHz)
+	[-i integration_interval (default: 10 seconds)]
+	 (buggy if a full sweep takes longer than the interval)
+	[-1 enables single-shot mode (default: off)]
+	[-e exit_timer (default: off/0)]
+	[-d device_index (default: 0)]
+	[-g tuner_gain (default: automatic)]
+	[-p ppm_error (default: 0)]
+	filename (a '-' dumps samples to stdout)
+	 (omitting the filename also uses stdout)
+
+Experimental options:
+	[-w window (default: rectangle)]
+	 (hamming, blackman, blackman-harris, hann-poisson, bartlett, youssef)
+	[-c crop_percent (default: 0%, recommended: 20%-50%)]
+	 (discards data at the edges, 100% discards everything)
+	 (has no effect for bins larger than 1MHz)
+	[-F fir_size (default: disabled)]
+	 (enables low-leakage downsample filter,
+	  fir_size can be 0 or 9.  0 has bad roll off,
+	  try with '-c 50%')
+	[-P enables peak hold (default: off)]
+	[-D enable direct sampling (default: off)]
+	[-O enable offset tuning (default: off)]
+
+CSV FFT output columns:
+	date, time, Hz low, Hz high, Hz step, samples, dbm, dbm, ...
+
+Examples:
+	rtl_power -f 88M:108M:125k fm_stations.csv
+	 (creates 160 bins across the FM band,
+	  individual stations should be visible)
+	rtl_power -f 100M:1G:1M -i 5m -1 survey.csv
+	 (a five minute low res scan of nearly everything)
+	rtl_power -f ... -i 15m -1 log.csv
+	 (integrate for 15 minutes and exit afterwards)
+	rtl_power -f ... -e 1h | gzip > log.csv.gz
+	 (collect data for one hour and compress it on the fly)
+
+Convert CSV to a waterfall graphic with:
+	 http://kmkeen.com/tmp/heatmap.py.txt </PRE>
+	 
+    <H3><TT>rtl_sdr</TT>, an I/Q recorder for RTL2832 based DVB-T receivers</H3>
+    <PRE>
+Usage:	 -f frequency_to_tune_to [Hz]
+	[-s samplerate (default: 2048000 Hz)]
+	[-d device_index (default: 0)]
+	[-g gain (default: 0 for auto)]
+	[-b output_block_size (default: 16 * 16384)]
+	[-n number of samples to read (default: 0, infinite)]
+	[-S force sync output (default: async)]
+	filename (a '-' dumps samples to stdout)</PRE> 
+	   
+    <H3><TT>rtl_tcp</TT>, an I/Q spectrum server for RTL2832 based DVB-T receivers</H3>
+    <PRE>
+Usage:	[-a listen address]
+	[-p listen port (default: 1234)]
+	[-f frequency to tune to [Hz]]
+	[-g gain (default: 0 for auto)]
+	[-s samplerate in Hz (default: 2048000 Hz)]
+	[-b number of buffers (default: 32, set by library)]
+	[-n max number of linked list buffers to keep (default: 500)]
+	[-d device index (default: 0)]</PRE>
+	  Example of running on <TT>umber-pi</TT>
+	  <PRE>
+  rtl_tcp -a 192.168.0.13 -f 89900000 -s 200000</PRE>
+streams raw KPFK data. <TT>waterfall_client.py</TT> connects to this and make a
+waterfall plot.
+ 
+    <H3><TT>rtl_test</TT>, a benchmark tool for RTL2832 based DVB-T receivers</H3>
+    <PRE>
+Usage:
+	[-s samplerate (default: 2048000 Hz)]
+	[-d device_index (default: 0)]
+	[-t enable Elonics E4000 tuner benchmark]
+	[-p enable PPM error measurement]
+	[-b output_block_size (default: 16 * 16384)]
+	[-S force sync output (default: async)]</PRE>
+	
+    
+    <H2>Python Software</H2>
+    <H3>Programs</H3>
     <DL>
       <DT>baseline_avg.py</DT>
       <DD>
@@ -60,10 +248,10 @@
         16 channels.
       </DD>
     </DL>
-    <H2><TT>rtlsdr</TT> Module</H2>
+    <H3><TT>rtlsdr</TT> Module</H3>
 
     If this module is run as a program it will produce a dynamic spectrum.
-    <H3>Classes</H3>
+    <H4>Classes</H4>
     <DL>
       <DT>RtlSdrDevStr(ct.Structure)</DT>
       <DD>
@@ -80,7 +268,7 @@
         Class to represent a RealTek-based SDR.
       </DD>
     </DL>
-    <H3>Module Methods</H3>
+    <H4>Module Methods</H4>
     <DL>
       <DT>get_device_count()</DT>
       <DD>Returns the number of RTL SDR devices on the bus.</DD>

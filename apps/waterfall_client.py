@@ -1,4 +1,10 @@
 """
+Waterfall client to streamed radio RF server
+
+Example of server::
+  rtl_tcp -a 192.168.0.13 -f 89900000 -s 200000
+  
+  
 Notes on timing
 ===============
 It takes 0.8 s to grab the 256 lines for the initial image. That works out to
