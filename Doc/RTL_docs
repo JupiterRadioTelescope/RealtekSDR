@@ -1,18 +1,3 @@
-rtl_tcp, an I/Q spectrum server for RTL2832 based DVB-T receivers
-
-Usage:	[-a listen address]
-	[-p listen port (default: 1234)]
-	[-f frequency to tune to [Hz]]
-	[-g gain (default: 0 for auto)]
-	[-s samplerate in Hz (default: 2048000 Hz)]
-	[-b number of buffers (default: 32, set by library)]
-	[-n max number of linked list buffers to keep (default: 500)]
-	[-d device index (default: 0)]
-
-Example running on home RPi:
-  rtl_tcp -a 192.168.0.13 -f 89900000 -s 200000
-streams raw KPFK data.
- 
 ----------------------------------------------------------------------
 rtl_test, a benchmark tool for RTL2832 based DVB-T receivers
 
@@ -23,5 +8,158 @@ Usage:
         [-p enable PPM error measurement]
         [-b output_block_size (default: 16 * 16384)]
         [-S force sync output (default: async)]
+-----------------------------------------------------------------------
+rtl_sdr, an I/Q recorder for RTL2832 based DVB-T receivers
+
+Usage:	 -f frequency_to_tune_to [Hz]
+	[-s samplerate (default: 2048000 Hz)]
+	[-d device_index (default: 0)]
+	[-g gain (default: 0 for auto)]
+	[-p ppm_error (default: 0)]
+	[-b output_block_size (default: 16 * 16384)]
+	[-n number of samples to read (default: 0, infinite)]
+	[-S force sync output (default: async)]
+	filename (a '-' dumps samples to stdout)
+-----------------------------------------------------------------------
+rtl_tcp, an I/Q spectrum server for RTL2832 based DVB-T receivers
+
+Usage:	[-a listen address]
+	[-p listen port (default: 1234)]
+	[-f frequency to tune to [Hz]]
+	[-g gain (default: 0 for auto)]
+	[-s samplerate in Hz (default: 2048000 Hz)]
+	[-b number of buffers (default: 15, set by library)]
+	[-n max number of linked list buffers to keep (default: 500)]
+	[-d device index (default: 0)]
+	[-P ppm_error (default: 0)]
+	[-T enable bias-T on GPIO PIN 0 (works for rtl-sdr.com v3 dongles)]
+-----------------------------------------------------------------------------
+rtl_fm, a simple narrow band FM demodulator for RTL2832 based DVB-T receivers
+
+Use:	rtl_fm -f freq [-options] [filename]
+	-f frequency_to_tune_to [Hz]
+	    use multiple -f for scanning (requires squelch)
+	    ranges supported, -f 118M:137M:25k
+	[-M modulation (default: fm)]
+	    fm, wbfm, raw, am, usb, lsb
+	    wbfm == -M fm -s 170k -o 4 -A fast -r 32k -l 0 -E deemp
+	    raw mode outputs 2x16 bit IQ pairs
+	[-s sample_rate (default: 24k)]
+	[-d device_index (default: 0)]
+	[-T enable bias-T on GPIO PIN 0 (works for rtl-sdr.com v3 dongles)]
+	[-g tuner_gain (default: automatic)]
+	[-l squelch_level (default: 0/off)]
+	[-p ppm_error (default: 0)]
+	[-E enable_option (default: none)]
+	    use multiple -E to enable multiple options
+	    edge:   enable lower edge tuning
+	    dc:     enable dc blocking filter
+	    deemp:  enable de-emphasis filter
+	    direct: enable direct sampling
+	    offset: enable offset tuning
+	filename ('-' means stdout)
+	    omitting the filename also uses stdout
+
+Experimental options:
+	[-r resample_rate (default: none / same as -s)]
+	[-t squelch_delay (default: 10)]
+	    +values will mute/scan, -values will exit
+	[-F fir_size (default: off)]
+	    enables low-leakage downsample filter
+	    size can be 0 or 9.  0 has bad roll off
+	[-A std/fast/lut choose atan math (default: std)]
+
+Produces signed 16 bit ints, use Sox or aplay to hear them.
+	rtl_fm ... | play -t raw -r 24k -es -b 16 -c 1 -V1 -
+	           | aplay -r 24k -f S16_LE -t raw -c 1
+	  -M wbfm  | play -r 32k ... 
+	  -s 22050 | multimon -t raw /dev/stdin
+-------------------------------------------------------------------------------
+rtl_eeprom, an EEPROM programming tool for RTL2832 based DVB-T receivers
+
+Usage:
+	[-d device_index (default: 0)]
+	[-m <str> set manufacturer string]
+	[-p <str> set product string]
+	[-s <str> set serial number string]
+	[-i <0,1> disable/enable IR-endpoint]
+	[-g <conf> generate default config and write to device]
+	[   <conf> can be one of:]
+	[   realtek		Realtek default (as without EEPROM)]
+	[   realtek_oem		Realtek default OEM with EEPROM]
+	[   noxon		Terratec NOXON DAB Stick]
+	[   terratec_black	Terratec T Stick Black]
+	[   terratec_plus	Terratec T Stick+ (DVB-T/DAB)]
+	[-w <filename> write dumped file to device]
+	[-r <filename> dump EEPROM to file]
+	[-h display this help text]
+-------------------------------------------------------------------------------
+rtl_adsb, a simple ADS-B decoder
+
+Use:	rtl_adsb [-R] [-g gain] [-p ppm] [output file]
+	[-d device_index (default: 0)]
+	[-V verbove output (default: off)]
+	[-S show short frames (default: off)]
+	[-Q quality (0: no sanity checks, 0.5: half bit, 1: one bit (default), 2: two bits)]
+	[-e allowed_errors (default: 5)]
+	[-g tuner_gain (default: automatic)]
+	[-p ppm_error (default: 0)]
+	[-T enable bias-T on GPIO PIN 0 (works for rtl-sdr.com v3 dongles)]
+	filename (a '-' dumps samples to stdout)
+	 (omitting the filename also uses stdout)
+
+Streaming with netcat:
+	rtl_adsb | netcat -lp 8080
+	while true; do rtl_adsb | nc -lp 8080; done
+Streaming with socat:
+	rtl_adsb | socat -u - TCP4:sdrsharp.com:47806
+--------------------------------------------------------------------------
+rtl_power, a simple FFT logger for RTL2832 based DVB-T receivers
+
+Use:	rtl_power -f freq_range [-options] [filename]
+	-f lower:upper:bin_size [Hz]
+	 (bin size is a maximum, smaller more convenient bins
+	  will be used.  valid range 1Hz - 2.8MHz)
+	[-i integration_interval (default: 10 seconds)]
+	 (buggy if a full sweep takes longer than the interval)
+	[-1 enables single-shot mode (default: off)]
+	[-e exit_timer (default: off/0)]
+	[-d device_index (default: 0)]
+	[-g tuner_gain (default: automatic)]
+	[-p ppm_error (default: 0)]
+	[-T enable bias-T on GPIO PIN 0 (works for rtl-sdr.com v3 dongles)]
+	filename (a '-' dumps samples to stdout)
+	 (omitting the filename also uses stdout)
+
+Experimental options:
+	[-w window (default: rectangle)]
+	 (hamming, blackman, blackman-harris, hann-poisson, bartlett, youssef)
+	[-c crop_percent (default: 0%, recommended: 20%-50%)]
+	 (discards data at the edges, 100% discards everything)
+	 (has no effect for bins larger than 1MHz)
+	[-F fir_size (default: disabled)]
+	 (enables low-leakage downsample filter,
+	  fir_size can be 0 or 9.  0 has bad roll off,
+	  try with '-c 50%')
+	[-P enables peak hold (default: off)]
+	[-D enable direct sampling (default: off)]
+	[-O enable offset tuning (default: off)]
+
+CSV FFT output columns:
+	date, time, Hz low, Hz high, Hz step, samples, dbm, dbm, ...
+
+Examples:
+	rtl_power -f 88M:108M:125k fm_stations.csv
+	 (creates 160 bins across the FM band,
+	  individual stations should be visible)
+	rtl_power -f 100M:1G:1M -i 5m -1 survey.csv
+	 (a five minute low res scan of nearly everything)
+	rtl_power -f ... -i 15m -1 log.csv
+	 (integrate for 15 minutes and exit afterwards)
+	rtl_power -f ... -e 1h | gzip > log.csv.gz
+	 (collect data for one hour and compress it on the fly)
+
+Convert CSV to a waterfall graphic with:
+	 http://kmkeen.com/tmp/heatmap.py.txt 
 
 
