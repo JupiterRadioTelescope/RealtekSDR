@@ -7,7 +7,7 @@ spectra.
 from pylab import *
 from numpy.polynomial.chebyshev import chebfit, chebval
 from cPickle import dump, load
-from text import select_files, user_input
+from support.text import select_files, user_input
 
 files = select_files("baselines_*MHz.dat","Select one file by number: ")
 data = loadtxt(files)
