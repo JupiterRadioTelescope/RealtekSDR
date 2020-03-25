@@ -1,0 +1,78 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+
+<!-- This file generated using Python HTMLgen module. -->
+<HEAD>
+  <META NAME="GENERATOR" CONTENT="HTMLgen 2.2.2">
+        <TITLE>Radio Scanner</TITLE> </HEAD>
+<BODY>
+<H1 align="center">SDR Scanner</H1>
+
+<H4 align="center">Sat Aug 30 14:40:42 2014</H4>
+
+<h3>Radio Frequency Scan</h3>
+
+ <P> A software-defined radio (SDR), Realtek model <TT>DVB-T+DAB+FM</TT>,
+ is used to scant the radio frequency spectrum between specified limits,
+ with a minimum of 25 MHz and a maximum of 1725 MHz.
+
+
+<HR>
+
+<FORM METHOD="POST" ACTION="http://localhost/cgi-bin/radio_scan.py">
+SDR: <SELECT NAME="SDR" SIZE=1>
+<OPTION>Realtek RTL2838UHIDIR
+</SELECT>
+Gain<SELECT NAME="gain" SIZE=1>
+<OPTION>0
+<OPTION>9
+<OPTION>14
+<OPTION>27
+<OPTION>37
+<OPTION>77
+<OPTION>87
+<OPTION>125
+<OPTION>144
+<OPTION>157
+<OPTION>166
+<OPTION>197
+<OPTION>207
+<OPTION>229
+<OPTION>254
+<OPTION>280
+<OPTION>297
+<OPTION>328
+<OPTION>338
+<OPTION>364
+<OPTION>372
+<OPTION>386
+<OPTION>402
+<OPTION SELECTED>421
+<OPTION>434
+<OPTION>439
+<OPTION>445
+<OPTION>480
+<OPTION>496
+</SELECT>
+<BR>Min. frequency
+<INPUT TYPE="text" NAME="fmin" VALUE="25" SIZE=5>MHz,         Max. frequency
+<INPUT TYPE="text" NAME="fmax" VALUE="1725" SIZE=5>MHz,         Resolution
+<INPUT TYPE="text" NAME="rfbw" VALUE="   2.50" SIZE=7>MHz<BR>
+<INPUT TYPE="submit" NAME="action" VALUE="Scan" onClick="/tmp/get_device_ID.sh">
+</FORM>
+
+<HR>
+<h3>About HTMLgen</h3>
+
+ 
+ <P>The form is generated with Python module HTMLgen, which provides full form
+ support using the POST method. It provides an Input class supporting all input
+ types including script callbacks. The Input class also has two convenience
+ attributes, <code>llabel</code> and <code>rlabel</code>, which place plain
+ text to the left and right of the widget respectively. For persistant data
+ between form invocations, the StickyForm class is used.
+
+
+
+
+</BODY> </HTML>

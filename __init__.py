@@ -225,7 +225,9 @@ class RtlSdr(object):
     # open returns a pointer to the pointer where the struct is defined
     status = dev_open(devp, dev_ID)
     if status == -6:
-      raise RtlSdrException("", "SDR is already open")
+      #raise RtlSdrException("", "SDR is already open")
+      print("SDR is already open")
+      return devp
     elif status:
       raise RtlSdrException(status, "error return in RtlSdr open")
     # now that we have a pointer to the struct instance we can ask the device
@@ -275,7 +277,8 @@ class RtlSdr(object):
     @return: int, sampling rate in Hz
     """
     status = set_samp_rate(self.devp, sr)
-    if status:
+    if status == -22:
+      print("sample rate must be >225000 and <=3200000")
       raise RtlSdrException(status, "error return in set_samplerate")
     return self.get_samplerate()
 
@@ -526,6 +529,8 @@ def get_device_strings(dev_ID):
   if status:
     if status == -2:
       raise RtlSdrException(None,"No device connected")
+    if status == -3:
+      raise RtlSdrException(None,"Access denied")
     else:
       raise RtlSdrException(status, "error return in get_device_strings")
   return vendor.value, product.value, serial.value

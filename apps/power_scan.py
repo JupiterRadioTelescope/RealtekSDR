@@ -5,34 +5,36 @@ converting that to LSB and USB.  In effect, 500 kHz resolution.
 According to the scanner() code in /opt/rtl-sdr/src/rtl_power.c, the buffer is
 not reset between tunings.
 """
-from Electronics.Instruments.RealtekSDR.rtlsdr import *
+from sys import path, stdout
+from RealtekSDR import RtlSdr, get_devices
+from RealtekSDR import get_device_count, get_device_name, get_device_strings
 from pylab import *
 import scipy.fftpack
 from time import sleep
-from sys import stdout
 import logging
-from Data_Reduction import sideband_separate
+from Data_Reduction import sideband_separate, unpack_to_complex
 
 mylogger = logging.getLogger()
 logging.basicConfig()
-mylogger.setLevel(logging.WARNING)
+mylogger.setLevel(logging.DEBUG)
 
 n = get_device_count()
+mylogger.info("There are %d devices", n)
 vendor, product, serial = get_device_strings(0)
 device = get_device_name(0)
 
 start = 88
 end = 108
-step = 0.2
+step = 1
 rtlsdr = RtlSdr(0)
 sr = rtlsdr.set_samplerate(int(step*1000000))
 gains = rtlsdr.get_tuner_gains()
-print "gains =", gains
+mylogger.info("gains = %s", gains)
 gain = gains[12]
 status = rtlsdr.set_gain(gain)
-print "gain =", gain
+mylogger.info("gain = %f", gain)
 status = rtlsdr.reset_buffer()
-print "reset_buffer status:",status
+mylogger.info("reset_buffer status: %d",status)
 
 def get_power_scan(start, end, step, gain=0, num_samples=16384):
   freqs = []
